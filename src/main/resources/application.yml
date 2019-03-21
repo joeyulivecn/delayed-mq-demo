@@ -1,0 +1,18 @@
+server:
+  port: 9000
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+#    listener:
+#      direct:
+#        acknowledge-mode: manual
+#      simple:
+#        acknowledge-mode: manual
+logging:
+  level:
+    com.joe.delayedmqdemo: DEBUG
+    org.springframework.amqp: DEBUG
+    org.springframework.web: DEBUG
