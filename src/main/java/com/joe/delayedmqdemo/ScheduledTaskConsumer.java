@@ -9,11 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-//@Component
+@Component
 //@RabbitListener(queues = "delayed_message_queue")
 public class ScheduledTaskConsumer {
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @RabbitListener(queues = "monthly_member_order_queue")
+    public void memberOrderHandler(String content) {
+        log.info("receive message: " + content);
+    }
+
+    @RabbitListener(queues = "second_queue")
+    public void secondQueueHandler(String content) {
+        log.info("receive message from second_queue: " + content);
+    }
 
     @RabbitHandler
     public void handler(Object content) {

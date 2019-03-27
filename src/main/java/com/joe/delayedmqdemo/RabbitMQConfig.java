@@ -1,10 +1,6 @@
 package com.joe.delayedmqdemo;
 
-import com.rabbitmq.client.AMQP;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,5 +36,38 @@ public class RabbitMQConfig {
     @Bean
     Binding delayedMessageBinding() {
         return BindingBuilder.bind(delayedMessageQueue()).to(dlxExchange()).with("dlx-routing-key");
+    }
+
+    @Bean
+    CustomExchange monthlyMemberOrderExchange() {
+        Map<String, Object> args = new HashMap<String, Object>();
+        args.put("x-delayed-type", "direct");
+        return new CustomExchange("monthly_member_order_exchange", "x-delayed-message", true, false, args);
+    }
+
+    @Bean
+    Queue monthlyMemberOrderQueue() {
+        return new Queue("monthly_member_order_queue", true, false, false);
+    }
+
+    @Bean
+    Binding monthlyMemberOrderBinding() {
+        return BindingBuilder.bind(monthlyMemberOrderQueue())
+                .to(monthlyMemberOrderExchange())
+                .with("monthly-member-order-routing-key").noargs();
+    }
+
+    // try bind second queue to delayed message exchange
+    @Bean
+    Queue secondDelayedMQ() {
+        return new Queue("second_queue", true, false, false);
+    }
+
+    @Bean
+    Binding secondDelayedMQBinding() {
+        return BindingBuilder.bind(secondDelayedMQ())
+                .to(monthlyMemberOrderExchange())
+                .with("second-queue-routing-key")
+                .noargs();
     }
 }
