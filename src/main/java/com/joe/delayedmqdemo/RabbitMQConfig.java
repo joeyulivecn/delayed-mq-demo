@@ -70,4 +70,56 @@ public class RabbitMQConfig {
                 .with("second-queue-routing-key")
                 .noargs();
     }
+
+    @Bean
+    Queue queueWithAck() {
+        return new Queue("ack_test_queue", true, false, false);
+    }
+
+    //region DLX queue to handle failed task
+
+    @Bean
+    FanoutExchange fanoutExchange() {
+        return new FanoutExchange("orderStatusFanoutExchange", true, false);
+    }
+
+    @Bean
+    Queue firstOrderQueue() {
+        return new Queue("first_order_queue", true, false, false);
+    }
+
+    @Bean
+    DirectExchange orderDLX() {
+        return new DirectExchange("order-dlx", true, false);
+    }
+
+    @Bean
+    Queue secondOrderQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", "order-dlx");
+        args.put("x-dead-letter-routing-key", "order-dlx-routing-key");
+        return new Queue("second_order_queue", true, false, false, args);
+    }
+
+    @Bean
+    Binding firstQueueBinding() {
+        return BindingBuilder.bind(firstOrderQueue()).to(fanoutExchange());
+    }
+
+    @Bean
+    Binding secondQueueBinding() {
+        return BindingBuilder.bind(secondOrderQueue()).to(fanoutExchange());
+    }
+
+    @Bean
+    Queue failedOrderStatusQueue() {
+        return new Queue("failed_order_status_queue", true, false, false);
+    }
+
+    @Bean
+    Binding failedOrderStatusQueueBinding() {
+        return BindingBuilder.bind(failedOrderStatusQueue()).to(orderDLX()).with("order-dlx-routing-key");
+    }
+
+    //endregion
 }

@@ -6,6 +6,11 @@ spring:
     port: 5672
     username: rmconn
     password: abc123
+    listener:
+      direct:
+        acknowledge-mode: manual
+      simple:
+        acknowledge-mode: manual
 #    listener:
 #      direct:
 #        acknowledge-mode: manual
