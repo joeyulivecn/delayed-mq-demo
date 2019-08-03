@@ -22,7 +22,6 @@ public class DelayedMqDemoApplicationTests {
     public void contextLoads() {
     }
 
-
     @Test
     public void delayedMessageExchangePlugin() {
         MessagePostProcessor processor = message -> {
@@ -46,6 +45,10 @@ public class DelayedMqDemoApplicationTests {
         }
 
         System.out.println("---> Send hello world to queue");
+
+        for (int i = 0; i < 3; i++) {
+            rabbitTemplate.convertAndSend("monthly_member_order_exchange", "second-queue-routing-key", ("to second queue" + LocalDateTime.now().toString()), processor2);
+        }
     }
 
     @Test
@@ -76,5 +79,10 @@ public class DelayedMqDemoApplicationTests {
         for (int i = 0; i < 10; i++) {
             rabbitTemplate.convertAndSend("orderStatusFanoutExchange", "", "order status: " + i);
         }
+    }
+
+    @Test
+    public void ackTest() {
+        rabbitTemplate.convertAndSend("ack_test_queue", "test ack message: " + LocalDateTime.now().toString());
     }
 }

@@ -7,11 +7,10 @@ spring:
     username: rmconn
     password: abc123
     listener:
-      direct:
-        acknowledge-mode: manual
+      type: simple
       simple:
         acknowledge-mode: manual
-#    listener:
+        default-requeue-rejected: true
 #      direct:
 #        acknowledge-mode: manual
 #      simple:
